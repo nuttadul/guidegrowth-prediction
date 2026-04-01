@@ -68,7 +68,6 @@ st.subheader("Predicted correction rate")
 st.metric("Correction rate", f"{prediction:.2f} °/month")
 
 st.info(
-    "Categorical variables (e.g., diagnosis) are modeled by selecting a category, not as continuous values."
-)
+    "Root Mean Square Error (RMSE) = 1.25 °/month, R-Squared = 0.34 )
 
 
