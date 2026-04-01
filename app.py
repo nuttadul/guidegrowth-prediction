@@ -30,7 +30,7 @@ def predict_outcome(male: bool, skeletal_age: float, diagnosis: str, bone_segmen
 
 
 st.title("GuideGrowth Predict")
-st.caption("Prediction tool for correction rate based on a multivariable linear regression model")
+st.caption("Prediction tool for correction rate after hemiepiphysiodesis by Department of Orthopaedic Surgery, Faculty of Medicine Siriraj Hospital, Mahidol university")
 
 st.subheader("Enter predictor values")
 
