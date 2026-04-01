@@ -5,17 +5,17 @@ st.set_page_config(page_title="GuideGrowth Predict", layout="centered")
 INTERCEPT = 4.658909
 
 COEFFICIENTS = {
-    "male": 0.57,
-    "skeletal_age": -0.11,
+    "male": 0.5701791 ,
+    "skeletal_age": -0.1057164,
     "diagnosis": {
         "Skeletal dysplasia": 0.0,
-        "Idiopathic": -3.39,
-        "Physeal causes": -3.63,
-        "Metabolic causes": -3.77,
+        "Idiopathic": -3.394905 ,
+        "Physeal causes": -3.628057 ,
+        "Metabolic causes": -3.773683 ,
     },
     "bone_segment": {
         "Proximal tibia": 0.0,
-        "Distal femur": 0.94,
+        "Distal femur": 0.9431412 ,
     },
 }
 
