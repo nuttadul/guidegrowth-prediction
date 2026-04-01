@@ -71,6 +71,4 @@ st.info(
     "Categorical variables (e.g., diagnosis) are modeled by selecting a category, not as continuous values."
 )
 
-st.markdown("---")
-st.markdown("### Run locally")
-st.code("pip install streamlit\nstreamlit run app.py", language="bash")
+
