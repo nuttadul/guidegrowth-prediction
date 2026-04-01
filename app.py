@@ -68,6 +68,6 @@ st.subheader("Predicted correction rate")
 st.metric("Correction rate", f"{prediction:.2f} °/month")
 
 st.info(
-    "Root Mean Square Error (RMSE) = 1.25 °/month, R-Squared = 0.34 )
+    "Root Mean Square Error (RMSE) = 1.25 °/month, R-Squared = 0.34" )
 
 
