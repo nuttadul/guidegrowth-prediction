@@ -20,35 +20,128 @@ COEFFICIENTS = {
     },
 }
 
-def predict(male, age, diagnosis, segment):
+def predict(male: bool, age: float, diagnosis: str, segment: str) -> float:
     y = INTERCEPT
-    y += COEFFICIENTS["male"] if male else 0
+    y += COEFFICIENTS["male"] if male else 0.0
     y += COEFFICIENTS["skeletal_age"] * age
     y += COEFFICIENTS["diagnosis"][diagnosis]
     y += COEFFICIENTS["bone_segment"][segment]
     return y
 
-st.title("GuideGrowth Predict")
-st.caption("Linear regression prediction tool")
+st.markdown(
+    """
+    <style>
+    .main > div {
+        max-width: 850px;
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+    .gg-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+        background: #ffffff;
+        margin-bottom: 1rem;
+    }
+    div[data-testid="stMetric"] {
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 0.8rem 1rem;
+        background: #fafafa;
+    }
+    .gg-small {
+        color: #4b5563;
+        font-size: 0.95rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-sex = st.selectbox("Sex", ["Female", "Male"])
-age = st.number_input("Skeletal age", 0.0, 30.0, 10.0)
-diagnosis = st.selectbox("Diagnosis", list(COEFFICIENTS["diagnosis"].keys()))
-segment = st.selectbox("Bone segment", list(COEFFICIENTS["bone_segment"].keys()))
+st.title("GuideGrowth Predict")
+st.caption("Prediction tool for correction rate based on the final multivariable linear regression model")
+
+st.markdown('<div class="gg-card">', unsafe_allow_html=True)
+st.markdown("### Patient inputs")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    sex = st.selectbox(
+        "Sex",
+        ["Female", "Male"],
+        help="Biologic sex used in the model.",
+    )
+    age = st.number_input(
+        "Skeletal age (years)",
+        min_value=0.0,
+        max_value=30.0,
+        value=10.0,
+        step=0.1,
+        help="Enter skeletal age in years.",
+    )
+
+with col2:
+    diagnosis = st.selectbox(
+        "Diagnosis category",
+        list(COEFFICIENTS["diagnosis"].keys()),
+        help="Categorical diagnosis is handled with indicator variables, not as a continuous number.",
+    )
+    segment = st.selectbox(
+        "Bone segment",
+        list(COEFFICIENTS["bone_segment"].keys()),
+        help="Anatomic segment used in the model.",
+    )
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 pred = predict(sex == "Male", age, diagnosis, segment)
 
-st.metric("Predicted value", f"{pred:.2f}")
+st.markdown('<div class="gg-card">', unsafe_allow_html=True)
+st.markdown("### Predicted outcome")
+st.metric("Correction rate", f"{pred:.2f}°")
+st.markdown('<div class="gg-small">Outcome unit = degrees</div>', unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
-df = pd.DataFrame({
-    "Component": ["Intercept", "Sex", "Age", "Diagnosis", "Segment"],
-    "Value": [
-        INTERCEPT,
-        COEFFICIENTS["male"] if sex == "Male" else 0,
-        COEFFICIENTS["skeletal_age"] * age,
-        COEFFICIENTS["diagnosis"][diagnosis],
-        COEFFICIENTS["bone_segment"][segment]
-    ]
-})
+st.markdown('<div class="gg-card">', unsafe_allow_html=True)
+st.markdown("### Model equation")
+st.latex(
+    r"\hat{Y} = 4.6589 + 0.57(Male) - 0.11(Skeletal\ Age) - 3.39(Idiopathic) - 3.63(Physeal) - 3.77(Metabolic) + 0.94(Distal\ Femur)"
+)
+st.markdown(
+    """
+- **Outcome** = correction rate (degrees)  
+- **Skeletal age** = years  
+- **Reference diagnosis** = Skeletal dysplasia  
+- **Reference bone segment** = Proximal tibia  
+"""
+)
+st.markdown("</div>", unsafe_allow_html=True)
 
-st.dataframe(df, use_container_width=True)
+contrib_df = pd.DataFrame(
+    {
+        "Component": [
+            "Intercept",
+            "Male sex",
+            "Skeletal age (years)",
+            f"Diagnosis: {diagnosis}",
+            f"Bone segment: {segment}",
+        ],
+        "Contribution to prediction (degrees)": [
+            INTERCEPT,
+            COEFFICIENTS["male"] if sex == "Male" else 0.0,
+            COEFFICIENTS["skeletal_age"] * age,
+            COEFFICIENTS["diagnosis"][diagnosis],
+            COEFFICIENTS["bone_segment"][segment],
+        ],
+    }
+)
+
+st.markdown('<div class="gg-card">', unsafe_allow_html=True)
+st.markdown("### Contribution of each model term")
+st.dataframe(contrib_df, use_container_width=True, hide_index=True)
+st.markdown("</div>", unsafe_allow_html=True)
+
+st.info(
+    "Categorical predictors are modeled by selecting a category and applying its coefficient relative to the reference group."
+)
